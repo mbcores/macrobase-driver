@@ -17,8 +17,8 @@ class Context(UserDict):
 
         self[key] = value
 
-    def __getitem__(self, key):
-        return self[key]
+    # def __getitem__(self, key):
+    #     return self[key]
 
     def __iter__(self):
         return self.__iter__()
