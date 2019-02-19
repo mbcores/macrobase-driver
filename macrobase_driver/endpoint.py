@@ -14,7 +14,7 @@ class Endpoint(object, metaclass=abc.ABCMeta):
         self.__name__ = self.__class__.__name__
 
     async def __call__(self, *args, **kwargs):
-        return await self.handle(*args, kwargs)
+        return await self.handle(*args, **kwargs)
 
     @abc.abstractmethod
     async def handle(self, *args, **kwargs):
