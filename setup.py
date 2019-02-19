@@ -5,7 +5,7 @@ setup(
     version='0.0.1',
     packages=find_packages(),
     url='https://github.com/mbcores/macrobase-driver',
-    license='',
+    license='MIT',
     author='Alexey Shagaleev',
     author_email='alexey.shagaleev@yandex.ru',
     description='Macrobase drivers base',
