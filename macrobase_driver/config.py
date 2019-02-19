@@ -1,4 +1,5 @@
 from enum import Enum
+from sanic_envconfig import EnvConfig
 
 
 class LogFormat(Enum):
@@ -23,7 +24,7 @@ class LogLevel(Enum):
         return str(self.value)
 
 
-class SimpleConfig:
+class SimpleConfig(EnvConfig):
 
     LOGO: str = """
  _____       _
