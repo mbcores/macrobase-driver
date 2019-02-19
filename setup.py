@@ -10,6 +10,7 @@ setup(
     author_email='alexey.shagaleev@yandex.ru',
     description='Macrobase drivers base',
     install_requires=[
+        'sanic-envconfig==1.0.1',
         'structlog==19.1.0',
         'python-rapidjson==0.7.0'
     ]
