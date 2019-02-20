@@ -64,6 +64,12 @@ class BaseConfig(object):
 
         return super(BaseConfig, self).__getattribute__(name)
 
+    def __setattr__(self, key, value):
+        if hasattr(self, '_default') and key in self._default.keys():
+            self._default[key] = value
+        else:
+            super.__setattr__(self, key, value)
+
     def _should_wrap(self, name: str) -> bool:
         return name.isupper() and not name.startswith('_')
 
