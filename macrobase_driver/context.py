@@ -20,8 +20,8 @@ class Context(UserDict):
     # def __getitem__(self, key):
     #     return self[key]
 
-    def __iter__(self):
-        return self.__iter__()
+    # def __iter__(self):
+    #     return super.__iter__()
 
     def __getattr__(self, item):
         if item not in self:
