@@ -29,9 +29,11 @@ class BaseConfig(object):
     _parsers = {}
 
     def __init__(self):
+        super().__init__()
+
         self._default = {}
         self._default = {property: self.get(property) for property in self.__dir__() if self._should_wrap(property)}
-        self._types = {property: get_type_hints(self).get(property) for property, value in self._default.items()}
+        self._types = {property: get_type_hints(type(self)).get(property) for property, value in self._default.items()}
 
     def get(self, name: str):
         return self.__getattribute__(name)
@@ -108,6 +110,16 @@ def parse_int(value: str) -> int:
 @BaseConfig.parser(float)
 def parse_float(value: str) -> float:
     return float(value)
+
+
+@BaseConfig.parser(LogLevel)
+def parse_log_level(value: str) -> LogLevel:
+    return LogLevel(value)
+
+
+@BaseConfig.parser(LogFormat)
+def parse_log_format(value: str) -> LogFormat:
+    return LogFormat(value)
 
 
 class SimpleConfig(BaseConfig):
