@@ -1,9 +1,26 @@
 import rapidjson
 import logging
 
-from macrobase_driver.config import SimpleConfig, LogFormat
+from macrobase.config import AppConfig
+from macrobase_driver.config import LogFormat
 
 import structlog
+
+
+class ExtraLogsRenderer(object):
+    """
+    Add application information with key `service`.
+    """
+
+    def __init__(self, config: AppConfig):
+        self.config = config
+
+    def __call__(self, logger, name, event_dict):
+        event_dict['service'] = {
+            'version': self.config.VERSION
+        }
+
+        return event_dict
 
 
 def add_log_location_data(logger, method_name, event_dict):
@@ -26,6 +43,7 @@ def add_log_location_data(logger, method_name, event_dict):
 
 def add_request_data(logger, method_name, event_dict):
     record = event_dict.get("_record")
+
     if record is not None:
         byte = getattr(record, 'byte', None)
         host = getattr(record, 'host', None)
@@ -43,6 +61,7 @@ def add_request_data(logger, method_name, event_dict):
 
         if not event_dict['event']:
             event_dict['event'] = f'({host}): {request} {status} {byte}'
+
     return event_dict
 
 
@@ -59,7 +78,7 @@ structlog.configure(
         timestamper,
         structlog.processors.StackInfoRenderer(),
         structlog.processors.format_exc_info,
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter,
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter
     ],
     context_class=dict,
     logger_factory=structlog.stdlib.LoggerFactory(),
@@ -68,7 +87,7 @@ structlog.configure(
 )
 
 
-def get_logging_config(config: SimpleConfig) -> dict:
+def get_logging_config(config: AppConfig) -> dict:
     pre_chain = [
         # Add the log level and a timestamp to the event_dict if the log entry
         # is not from structlog.
@@ -78,6 +97,7 @@ def get_logging_config(config: SimpleConfig) -> dict:
         add_log_location_data,
         add_request_data,
         timestamper,
+        ExtraLogsRenderer(config)
     ]
 
     level = logging.getLevelName(config.LOG_LEVEL.raw.upper())
