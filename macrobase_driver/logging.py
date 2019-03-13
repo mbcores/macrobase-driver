@@ -7,22 +7,6 @@ from macrobase_driver.config import LogFormat
 import structlog
 
 
-class ExtraLogsRenderer(object):
-    """
-    Add application information with key `service`.
-    """
-
-    def __init__(self, config: AppConfig):
-        self.config = config
-
-    def __call__(self, logger, name, event_dict):
-        event_dict['service'] = {
-            'version': self.config.VERSION
-        }
-
-        return event_dict
-
-
 def add_log_location_data(logger, method_name, event_dict):
     record = event_dict.get("_record")
     if record is not None:
@@ -68,23 +52,23 @@ def add_request_data(logger, method_name, event_dict):
 timestamper = structlog.processors.TimeStamper(fmt="%Y-%m-%d %H:%M:%S.%f")
 
 
-structlog.configure(
-    processors=[
-        structlog.stdlib.add_log_level,
-        structlog.stdlib.add_logger_name,
-        add_log_location_data,
-        add_request_data,
-        structlog.stdlib.PositionalArgumentsFormatter(),
-        timestamper,
-        structlog.processors.StackInfoRenderer(),
-        structlog.processors.format_exc_info,
-        structlog.stdlib.ProcessorFormatter.wrap_for_formatter
-    ],
-    context_class=dict,
-    logger_factory=structlog.stdlib.LoggerFactory(),
-    wrapper_class=structlog.stdlib.BoundLogger,
-    cache_logger_on_first_use=True,
-)
+# structlog.configure(
+#     processors=[
+#         structlog.stdlib.add_log_level,
+#         structlog.stdlib.add_logger_name,
+#         add_log_location_data,
+#         add_request_data,
+#         structlog.stdlib.PositionalArgumentsFormatter(),
+#         timestamper,
+#         structlog.processors.StackInfoRenderer(),
+#         structlog.processors.format_exc_info,
+#         structlog.stdlib.ProcessorFormatter.wrap_for_formatter
+#     ],
+#     context_class=dict,
+#     logger_factory=structlog.stdlib.LoggerFactory(),
+#     wrapper_class=structlog.stdlib.BoundLogger,
+#     cache_logger_on_first_use=True,
+# )
 
 
 def get_logging_config(config: AppConfig) -> dict:
@@ -96,8 +80,7 @@ def get_logging_config(config: AppConfig) -> dict:
         structlog.processors.format_exc_info,
         add_log_location_data,
         add_request_data,
-        timestamper,
-        ExtraLogsRenderer(config)
+        timestamper
     ]
 
     level = logging.getLevelName(config.LOG_LEVEL.raw.upper())
