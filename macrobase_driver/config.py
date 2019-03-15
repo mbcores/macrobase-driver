@@ -1,5 +1,6 @@
 import os
-from typing import get_type_hints, Type
+from typing import get_type_hints, Type, List
+
 from enum import Enum
 
 
@@ -111,6 +112,9 @@ def parse_int(value: str) -> int:
 def parse_float(value: str) -> float:
     return float(value)
 
+@BaseConfig.parser(List[str])
+def parse_list(value: str) -> List[str]:
+    return value.split(',')
 
 @BaseConfig.parser(LogLevel)
 def parse_log_level(value: str) -> LogLevel:
