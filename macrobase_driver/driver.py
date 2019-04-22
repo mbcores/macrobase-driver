@@ -13,6 +13,9 @@ class MacrobaseDriver(object):
         self.config = DriverConfig
         self.context = Context()
 
+    def __repr__(self):
+        return f'<MacrobaseDriver name:{self.name}>'
+
     @property
     def loop(self) -> AbstractEventLoop:
         return get_event_loop()
