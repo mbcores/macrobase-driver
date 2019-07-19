@@ -8,8 +8,10 @@ from macrobase_driver.hook import HookNames, HookHandler
 
 class MacrobaseDriver(object):
 
-    def __init__(self, name: str = None, *args, **kwargs):
+    def __init__(self, name: str = None, loop: AbstractEventLoop = None, *args, **kwargs):
         self.name = name
+        self._loop = loop
+
         self.config = DriverConfig
         self.context = Context()
 
@@ -18,7 +20,7 @@ class MacrobaseDriver(object):
 
     @property
     def loop(self) -> AbstractEventLoop:
-        return get_event_loop()
+        return self._loop or get_event_loop()
 
     def update_config(self, config_obj: ClassVar[DriverConfig]):
         pass

@@ -137,8 +137,6 @@ class SimpleConfig(BaseConfig):
 |_____/|_|  |_| \_/ \___|_|
 """
 
-    WORKERS: int = 1
-
     LOG_FORMAT: LogFormat = LogFormat.json
     LOG_LEVEL: LogLevel = LogLevel.info
 
