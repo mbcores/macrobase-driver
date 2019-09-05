@@ -7,6 +7,23 @@ from macrobase_driver.config import LogFormat
 import structlog
 
 
+class ExtraLogsRenderer(object):
+    """
+    Add application information with key `service`.
+    """
+
+    def __init__(self, config: AppConfig):
+        self.version = config.VERSION
+
+    def __call__(self, logger, name, event_dict):
+        if isinstance(event_dict, dict):
+            event_dict['service'] = {
+                'version': self.version
+            }
+
+            return event_dict
+
+
 def add_log_location_data(logger, method_name, event_dict):
     record = event_dict.get("_record")
     if record is not None:
@@ -72,16 +89,27 @@ timestamper = structlog.processors.TimeStamper(fmt="iso")
 
 
 def get_logging_config(config: AppConfig) -> dict:
-    pre_chain = [
-        # Add the log level and a timestamp to the event_dict if the log entry
-        # is not from structlog.
+    logging_processors = [
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
-        structlog.processors.format_exc_info,
         add_log_location_data,
-        add_request_data,
-        timestamper
+        timestamper,
+        ExtraLogsRenderer(config),
+        structlog.processors.format_exc_info,
     ]
+    all_processors = logging_processors + [
+        structlog.stdlib.PositionalArgumentsFormatter(),
+        structlog.processors.StackInfoRenderer(),
+        structlog.stdlib.ProcessorFormatter.wrap_for_formatter
+    ]
+
+    structlog.configure(
+        processors=all_processors,
+        context_class=dict,
+        logger_factory=structlog.stdlib.LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
 
     level = logging.getLevelName(config.LOG_LEVEL.raw.upper())
     if config.DEBUG:
@@ -94,12 +122,12 @@ def get_logging_config(config: AppConfig) -> dict:
             LogFormat.plain: {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.dev.ConsoleRenderer(colors=False),
-                "foreign_pre_chain": pre_chain,
+                "foreign_pre_chain": logging_processors,
             },
             LogFormat.json: {
                 "()": structlog.stdlib.ProcessorFormatter,
                 "processor": structlog.processors.JSONRenderer(serializer=rapidjson.dumps),
-                "foreign_pre_chain": pre_chain,
+                "foreign_pre_chain": logging_processors,
             }
         },
         "handlers": {
