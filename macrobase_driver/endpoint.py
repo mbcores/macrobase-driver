@@ -9,7 +9,7 @@ class Endpoint(object, metaclass=abc.ABCMeta):
     Endpoint protocol for processing from macrobase and his drivers
     """
 
-    def __init__(self, context: Context, config: BaseConfig):
+    def __init__(self, context: Context, config: BaseConfig, *args):
         self.context = context
         self.config = config
         self.__name__ = self.__class__.__name__
