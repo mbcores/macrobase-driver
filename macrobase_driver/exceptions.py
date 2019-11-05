@@ -5,3 +5,15 @@ class ContextLockedException(Exception):
 
 class HookException(Exception):
     pass
+
+
+class ConfigFileNotFoundException(Exception):
+    pass
+
+
+class ConfigFileNotSupportFormatException(Exception):
+    pass
+
+
+class ConfigFileParseException(Exception):
+    pass

@@ -1,8 +1,8 @@
-import rapidjson
 import logging
+from typing import Type
+import rapidjson
 
-from macrobase.config import AppConfig
-from macrobase_driver.config import LogFormat
+from macrobase_driver.config import CommonConfig, DriverConfig, LogFormat
 
 import structlog
 
@@ -12,8 +12,8 @@ class ExtraLogsRenderer(object):
     Add application information with key `service`.
     """
 
-    def __init__(self, config: AppConfig):
-        self.version = config.VERSION
+    def __init__(self, version: str):
+        self.version = version
 
     def __call__(self, logger, name, event_dict):
         if isinstance(event_dict, dict):
@@ -88,13 +88,13 @@ timestamper = structlog.processors.TimeStamper(fmt="iso")
 # )
 
 
-def get_logging_config(config: AppConfig) -> dict:
+def get_logging_config(config: CommonConfig[DriverConfig]) -> dict:
     logging_processors = [
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
         add_log_location_data,
         timestamper,
-        ExtraLogsRenderer(config),
+        ExtraLogsRenderer(config.app.version),
         structlog.processors.format_exc_info,
     ]
     all_processors = logging_processors + [
@@ -111,8 +111,8 @@ def get_logging_config(config: AppConfig) -> dict:
         cache_logger_on_first_use=True,
     )
 
-    level = logging.getLevelName(config.LOG_LEVEL.raw.upper())
-    if config.DEBUG:
+    level = logging.getLevelName(config.app.log_level.raw.upper())
+    if config.driver.debug:
         level = logging.DEBUG
 
     return {
@@ -134,7 +134,7 @@ def get_logging_config(config: AppConfig) -> dict:
             "default": {
                 "level": level,
                 "class": "logging.StreamHandler",
-                "formatter": config.LOG_FORMAT,
+                "formatter": config.app.log_format,
             },
         },
         "loggers": {

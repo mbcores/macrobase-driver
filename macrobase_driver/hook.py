@@ -6,7 +6,7 @@ from macrobase_driver.exceptions import HookException
 
 from structlog import get_logger
 
-log = get_logger('SanicHooks')
+log = get_logger('Hooks')
 
 
 class HookNames(IntEnum):

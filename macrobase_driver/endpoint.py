@@ -1,7 +1,7 @@
 import abc
 
 from macrobase_driver.context import Context
-from macrobase_driver.config import BaseConfig
+from macrobase_driver.config import CommonConfig, DriverConfig
 
 
 class Endpoint(object, metaclass=abc.ABCMeta):
@@ -9,7 +9,7 @@ class Endpoint(object, metaclass=abc.ABCMeta):
     Endpoint protocol for processing from macrobase and his drivers
     """
 
-    def __init__(self, context: Context, config: BaseConfig, *args):
+    def __init__(self, context: Context, config: CommonConfig[DriverConfig], *args):
         self.context = context
         self.config = config
         self.__name__ = self.__class__.__name__
