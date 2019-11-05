@@ -1,34 +1,42 @@
+from abc import ABCMeta, abstractmethod
 from asyncio import AbstractEventLoop, get_event_loop
-from typing import ClassVar
+from typing import List, Dict
 
 from macrobase_driver.context import Context
-from macrobase_driver.config import DriverConfig
-from macrobase_driver.hook import HookNames, HookHandler
+from macrobase_driver.config import DriverConfig, CommonConfig, AppConfig
+from macrobase_driver.hook import HookHandler
 
 
-class MacrobaseDriver(object):
+class MacrobaseDriver(object, metaclass=ABCMeta):
 
-    def __init__(self, name: str = None, loop: AbstractEventLoop = None, *args, **kwargs):
+    def __init__(self, config: CommonConfig[AppConfig, DriverConfig], name: str = None, loop: AbstractEventLoop = None, *args, **kwargs):
         self.name = name
         self._loop = loop
 
-        self.config = DriverConfig
+        self._hooks: Dict[str, List[HookHandler]] = {}
+        self._config = config
         self.context = Context()
 
     def __repr__(self):
-        return f'<MacrobaseDriver name:{self.name}>'
+        return f'<{type(self)} name:{self.name}>'
+
+    @property
+    @abstractmethod
+    def config(self) -> CommonConfig[AppConfig, DriverConfig]:
+        pass
 
     @property
     def loop(self) -> AbstractEventLoop:
         return self._loop or get_event_loop()
 
-    def update_config(self, config_obj: ClassVar[DriverConfig]):
-        pass
+    @abstractmethod
+    def add_hook(self, name: str, handler):
+        if name not in self._hooks:
+            self._hooks[name] = []
 
-    def add_hook(self, name: HookNames, handler):
-        pass
+        self._hooks[name].append(HookHandler(self, handler))
 
-    async def _call_hooks(self, name: HookNames):
+    async def _call_hooks(self, name: str):
         if name not in self._hooks:
             return
 
