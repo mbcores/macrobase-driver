@@ -3,13 +3,13 @@ from asyncio import AbstractEventLoop, get_event_loop
 from typing import List, Dict
 
 from macrobase_driver.context import Context
-from macrobase_driver.config import DriverConfig, CommonConfig
+from macrobase_driver.config import DriverConfig, CommonConfig, AppConfig
 from macrobase_driver.hook import HookHandler
 
 
 class MacrobaseDriver(object, metaclass=ABCMeta):
 
-    def __init__(self, config: CommonConfig[DriverConfig], name: str = None, loop: AbstractEventLoop = None, *args, **kwargs):
+    def __init__(self, config: CommonConfig[AppConfig, DriverConfig], name: str = None, loop: AbstractEventLoop = None, *args, **kwargs):
         self.name = name
         self._loop = loop
 
@@ -22,7 +22,7 @@ class MacrobaseDriver(object, metaclass=ABCMeta):
 
     @property
     @abstractmethod
-    def config(self) -> CommonConfig[DriverConfig]:
+    def config(self) -> CommonConfig[AppConfig, DriverConfig]:
         pass
 
     @property

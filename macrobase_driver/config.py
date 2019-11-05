@@ -140,7 +140,7 @@ class BaseConfig(object):
 
 class AppConfig(BaseConfig):
 
-    LOGO: str = """
+    logo: str = """
                                     _                    
                                    | |                   
      _ __ ___   __ _  ___ _ __ ___ | |__   __ _ ___  ___ 
@@ -151,9 +151,10 @@ class AppConfig(BaseConfig):
 
     version: str = '0.0'
     name: str = 'macrobase'
-    debug: bool = False
+    # TODO: fix it
     workers: int = 1
 
+    debug: bool = False
     log_format: LogFormat = LogFormat.json
     log_level: LogLevel = LogLevel.info
 
@@ -169,20 +170,19 @@ class DriverConfig(BaseConfig):
 |_____/|_|  |_| \_/ \___|_|
 """
 
-    debug: bool = False
 
-
+AT = TypeVar('AT')
 DT = TypeVar('DT')
 
 
-class CommonConfig(Generic[DT]):
+class CommonConfig(Generic[AT, DT]):
 
-    def __init__(self, app_config: AppConfig, driver_config: DT):
+    def __init__(self, app_config: AT, driver_config: DT):
         self._app = app_config
         self._driver = driver_config
 
     @property
-    def app(self) -> AppConfig:
+    def app(self) -> AT:
         return self._app
 
     @property

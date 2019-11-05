@@ -2,7 +2,7 @@ import logging
 from typing import Type
 import rapidjson
 
-from macrobase_driver.config import CommonConfig, DriverConfig, LogFormat
+from macrobase_driver.config import AppConfig, CommonConfig, DriverConfig, LogFormat
 
 import structlog
 
@@ -88,13 +88,13 @@ timestamper = structlog.processors.TimeStamper(fmt="iso")
 # )
 
 
-def get_logging_config(config: CommonConfig[DriverConfig]) -> dict:
+def get_logging_config(config: AppConfig) -> dict:
     logging_processors = [
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
         add_log_location_data,
         timestamper,
-        ExtraLogsRenderer(config.app.version),
+        ExtraLogsRenderer(config.version),
         structlog.processors.format_exc_info,
     ]
     all_processors = logging_processors + [
@@ -111,8 +111,8 @@ def get_logging_config(config: CommonConfig[DriverConfig]) -> dict:
         cache_logger_on_first_use=True,
     )
 
-    level = logging.getLevelName(config.app.log_level.raw.upper())
-    if config.driver.debug:
+    level = logging.getLevelName(config.log_level.raw.upper())
+    if config.debug:
         level = logging.DEBUG
 
     return {
@@ -134,7 +134,7 @@ def get_logging_config(config: CommonConfig[DriverConfig]) -> dict:
             "default": {
                 "level": level,
                 "class": "logging.StreamHandler",
-                "formatter": config.app.log_format,
+                "formatter": config.log_format,
             },
         },
         "loggers": {
