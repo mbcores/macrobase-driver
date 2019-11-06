@@ -111,7 +111,7 @@ class BaseConfig(object):
         return not name.startswith('_') and not callable(getattr(self, name))
 
     def _parse_value(self, tp: Type, value: str) -> Any:
-        if type(value) == tp or tp not in self._type_parsers:
+        if type(value) == tp or tp not in self._type_parsers or value is None:
             return value
 
         return self._type_parsers.get(tp)(value)
