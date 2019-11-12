@@ -44,7 +44,7 @@ class BaseConfig(object):
             value = field.default
 
             if field.env_key is not None and field.env_key in os.environ:
-                value = os.environ.get(field.env_key)
+                value = field.parse(os.environ.get(field.env_key))
 
             setattr(self, key, value)
 
