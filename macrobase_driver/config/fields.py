@@ -19,6 +19,22 @@ class Int(Field):
         return int(str(value))
 
 
+class Float(Field):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def parse(self, value) -> float:
+        if value is None:
+            return self._default
+
+        return self.parse_value(value)
+
+    @staticmethod
+    def parse_value(value) -> float:
+        return float(str(value))
+
+
 class Str(Field):
 
     def __init__(self, *args, **kwargs):
