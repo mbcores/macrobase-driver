@@ -1,6 +1,7 @@
 from typing import Type
 
 from .base import BaseConfig, Field, CustomField
+import ast
 
 
 class Int(Field):
@@ -93,10 +94,13 @@ class List(Field):
 
     @staticmethod
     def parse_value(value) -> list:
-        if not isinstance(value, list):
+        if isinstance(value, list):
+            return value
+        elif isinstance(value, str):
+            return ast.literal_eval(value)
+        else:
             raise Exception
 
-        return value
 
 
 class Dict(Field):
