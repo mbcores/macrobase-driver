@@ -1,5 +1,5 @@
 from abc import ABCMeta, abstractmethod
-from asyncio import AbstractEventLoop, get_event_loop
+from asyncio import AbstractEventLoop, get_event_loop, new_event_loop, set_event_loop
 from typing import List, Dict
 
 from macrobase_driver.context import Context
@@ -27,7 +27,11 @@ class MacrobaseDriver(object, metaclass=ABCMeta):
 
     @property
     def loop(self) -> AbstractEventLoop:
-        return self._loop or get_event_loop()
+        if self._loop is None:
+            self._loop = new_event_loop()
+            set_event_loop(self._loop)
+
+        return self._loop
 
     @abstractmethod
     def add_hook(self, name: str, handler):
