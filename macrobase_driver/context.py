@@ -5,7 +5,7 @@ from collections import UserDict
 from .exceptions import ContextLockedException
 
 
-class Context(UserDict):
+class Context(dict):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
