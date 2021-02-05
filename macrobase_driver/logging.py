@@ -1,10 +1,43 @@
 import logging
+from contextvars import ContextVar
 from typing import Type
+from uuid import uuid4
+
 import rapidjson
 
 from macrobase_driver.config import AppConfig, CommonConfig, DriverConfig, LogFormat
 
 import structlog
+
+_cross_request_id = ContextVar('cross_request_id', default=None)
+
+
+def get_request_id() -> str:
+    """
+    get cross request id. generate and return if not set
+    """
+    req_id = _cross_request_id.get()
+
+    if not req_id:
+        req_id = str(uuid4())
+        _cross_request_id.set(req_id)
+
+    return req_id
+
+
+def set_request_id(request_id: str = None):
+    """
+    set cross request id
+    """
+    if not request_id:
+        request_id = str(uuid4())
+
+    _cross_request_id.set(request_id)
+
+
+def _cross_request_processor(logger, log_method, event_dict: dict) -> dict:
+    event_dict['crossRequestId'] = get_request_id()
+    return event_dict
 
 
 class ExtraLogsRenderer(object):
@@ -90,6 +123,7 @@ timestamper = structlog.processors.TimeStamper(fmt="iso")
 
 def get_logging_config(config: AppConfig) -> dict:
     logging_processors = [
+        _cross_request_processor,
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
         add_log_location_data,
@@ -145,3 +179,17 @@ def get_logging_config(config: AppConfig) -> dict:
             },
         }
     }
+
+
+def configure_logger():
+    """
+    configure structlog, add crossRequestId
+    """
+    conf = structlog._config._CONFIG
+    if _cross_request_processor not in conf.default_processors:
+        structlog.configure(processors=[_cross_request_processor, *conf.default_processors])
+
+
+def get_logger(*args, **kwargs) -> logging.Logger:
+    configure_logger()
+    return structlog.get_logger(*args, **kwargs)

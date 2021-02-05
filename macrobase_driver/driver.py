@@ -5,6 +5,7 @@ from typing import List, Dict
 from macrobase_driver.context import Context
 from macrobase_driver.config import DriverConfig, CommonConfig, AppConfig
 from macrobase_driver.hook import HookHandler
+from macrobase_driver.logging import configure_logger
 
 
 class MacrobaseDriver(object, metaclass=ABCMeta):
@@ -16,6 +17,7 @@ class MacrobaseDriver(object, metaclass=ABCMeta):
         self._hooks: Dict[str, List[HookHandler]] = {}
         self._config = config
         self.context = Context()
+        configure_logger()
 
     def __repr__(self):
         return f'<{type(self)} name:{self.name}>'
