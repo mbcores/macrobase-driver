@@ -12,6 +12,6 @@ setup(
     install_requires=[
         'structlog==19.2.0',
         'python-rapidjson==0.8.0',
-        'pyyaml==5.1.2'
+        'pyyaml==5.4'
     ]
 )
