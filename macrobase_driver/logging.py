@@ -45,14 +45,16 @@ class ExtraLogsRenderer(object):
     Add application information with key `service`.
     """
 
-    def __init__(self, version: str):
+    def __init__(self, version: str, env: str = None):
         self.version = version
+        self.env = env
 
     def __call__(self, logger, name, event_dict):
         if isinstance(event_dict, dict):
             event_dict['service'] = {
                 'version': self.version
             }
+            event_dict['env'] = self.env
 
             return event_dict
 
@@ -128,7 +130,7 @@ def get_logging_config(config: AppConfig) -> dict:
         structlog.stdlib.add_logger_name,
         add_log_location_data,
         timestamper,
-        ExtraLogsRenderer(config.version),
+        ExtraLogsRenderer(config.version, config.env),
         structlog.processors.format_exc_info,
     ]
     all_processors = logging_processors + [
