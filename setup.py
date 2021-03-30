@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='macrobase_driver',
-    version='2.2.1',
+    version='2.2.2',
     packages=find_packages(),
     url='https://github.com/mbcores/macrobase-driver',
     license='MIT',

@@ -37,6 +37,8 @@ class LogLevel(CustomField, Enum):
 
 class AppConfig(BaseConfig):
 
+    env = fields.Str('local', env_key='ENV')
+
     logo = fields.Str(default="""
                                     _
                                    | |
