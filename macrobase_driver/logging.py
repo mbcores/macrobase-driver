@@ -9,6 +9,12 @@ from macrobase_driver.config import AppConfig, CommonConfig, DriverConfig, LogFo
 
 import structlog
 
+try:
+    from structlog_sentry import SentryJsonProcessor, SentryProcessor
+except ImportError:
+    SentryJsonProcessor, SentryProcessor = None, None
+
+
 _cross_request_id = ContextVar('cross_request_id', default=None)
 
 
@@ -128,9 +134,17 @@ def get_logging_config(config: AppConfig) -> dict:
         _cross_request_processor,
         structlog.stdlib.add_log_level,
         structlog.stdlib.add_logger_name,
+        ExtraLogsRenderer(config.version, config.env),
+    ]
+
+    if config.log_format is LogFormat.json and SentryJsonProcessor:
+        logging_processors.append(SentryJsonProcessor(level=logging.ERROR))
+    elif SentryProcessor:
+        logging_processors.append(SentryProcessor(level=logging.ERROR))
+
+    logging_processors += [
         add_log_location_data,
         timestamper,
-        ExtraLogsRenderer(config.version, config.env),
         structlog.processors.format_exc_info,
     ]
     all_processors = logging_processors + [
